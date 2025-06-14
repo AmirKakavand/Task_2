@@ -3,6 +3,24 @@
 import { useState } from 'react';
 import { useTodo } from '../../context/todo-context';
 
+type RawImportedTodo = {
+  title: unknown;
+  completed: unknown;
+};
+
+const isValidImportedTodo = (item: unknown): item is RawImportedTodo => {
+  return (
+    typeof item === 'object' &&
+    item !== null &&
+    'title' in item &&
+    'completed' in item &&
+    typeof (item as Record<string, unknown>).title === 'string' &&
+    (item as Record<string, unknown>).completed === false
+  );
+};
+
+
+
 export default function ManagePage() {
   const { state, dispatch } = useTodo();
   const [importValue, setImportValue] = useState('');
@@ -26,33 +44,35 @@ export default function ManagePage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = () => {
-    try {
-      const parsed = JSON.parse(importValue);
-      if (!Array.isArray(parsed)) throw new Error();
+  type ImportedTodo = {
+  title: string;
+  completed: false;
+};
 
-      const valid = parsed.every(
-        (item) =>
-          typeof item.title === 'string' &&
-          typeof item.completed === 'boolean' &&
-          item.completed === false
-      );
+const handleImport = () => {
+  try {
+    const parsed: unknown = JSON.parse(importValue);
 
-      if (!valid) throw new Error();
-
-      const tasks = parsed.map((t: any) => ({
-        id: crypto.randomUUID(),
-        title: t.title,
-        completed: false,
-      }));
-
-      dispatch({ type: 'IMPORT_JSON', todos: tasks });
-      setImportValue('');
-      setImportError('');
-    } catch {
-      setImportError('Invalid JSON. Make sure it contains only incomplete tasks.');
+    if (!Array.isArray(parsed) || !parsed.every(isValidImportedTodo)) {
+      throw new Error();
     }
-  };
+
+    // ✅ Now TypeScript knows this is ImportedTodo[]
+    const tasks = (parsed as ImportedTodo[]).map((t) => ({
+      id: crypto.randomUUID(),
+      title: t.title,
+      completed: false,
+    }));
+
+    dispatch({ type: 'IMPORT_JSON', todos: tasks });
+    setImportValue('');
+    setImportError('');
+  } catch {
+    setImportError('Invalid JSON. Make sure it contains only incomplete tasks.');
+  }
+};
+
+
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4">
@@ -63,10 +83,10 @@ export default function ManagePage() {
           <li
             key={todo.id}
             className={`flex justify-between items-center px-4 py-2 rounded shadow ${
-              todo.completed ? 'bg-green-100' : 'bg-yellow-100'
+              todo.completed ? 'bg-gray-600' : 'bg-gray-300 text-gray-800'
             }`}
           >
-            <span className={todo.completed ? 'line-through' : ''}>
+            <span className={`break-words w-10/12 ${todo.completed ? 'line-through' : ''}`}>
               {todo.title}
             </span>
             <button

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTodo } from '../../context/todo-context';
+import { useState } from "react";
+import { useTodo } from "../../context/todo-context";
 
 export default function DeletePage() {
   const { state, dispatch } = useTodo();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleDelete = (id: string) => {
-    dispatch({ type: 'REMOVE_TODO', id });
-    setMessage('Task deleted successfully! ✅');
-    setTimeout(() => setMessage(''), 2000);
+    dispatch({ type: "REMOVE_TODO", id });
+    setMessage("Task deleted successfully! ✅");
+    setTimeout(() => setMessage(""), 2000);
   };
 
   return (
@@ -24,9 +24,17 @@ export default function DeletePage() {
           {state.todos.map((todo) => (
             <li
               key={todo.id}
-              className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded shadow"
+              className={`flex justify-between items-center ${
+                todo.completed ? "bg-gray-500" : "bg-gray-300"
+              } font-bold text-gray-800 px-4 py-2 rounded shadow`}
             >
-              <span>{todo.title}</span>
+              <span
+                className={`break-words w-10/12 pr-4 ${
+                  todo.completed ? "line-through" : ""
+                }`}
+              >
+                {todo.title}
+              </span>
               <button
                 onClick={() => handleDelete(todo.id)}
                 className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
@@ -38,9 +46,7 @@ export default function DeletePage() {
         </ul>
       )}
 
-      {message && (
-        <p className="text-green-600 mt-4 font-medium">{message}</p>
-      )}
+      {message && <p className="text-green-600 mt-4 font-medium">{message}</p>}
     </div>
   );
 }

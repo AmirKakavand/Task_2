@@ -57,9 +57,11 @@ export default function AddPage() {
           {state.todos.map((todo) => (
             <li
               key={todo.id}
-              className="bg-gray-100 px-3 py-1 rounded text-gray-800"
+              className={`bg-gray-100 px-3 py-1 rounded text-gray-800 ${
+                todo.completed ? "bg-gray-500 text-white line-through" : "bg-gray-300"
+              }`}
             >
-              {todo.title}
+              <span className="break-words">{todo.title}</span>
             </li>
           ))}
         </ul>
