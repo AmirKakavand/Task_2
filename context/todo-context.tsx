@@ -1,7 +1,7 @@
 // context/todo-context.tsx
 'use client';
 
-import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 
 export type Todo = {
   id: string;
@@ -61,6 +61,25 @@ const reducer = (state: State, action: Action): State => {
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, { todos: [] });
+
+  // Load initial state from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('todos');
+    if (stored) {
+      try {
+        const parsed: Todo[] = JSON.parse(stored);
+        dispatch({ type: 'IMPORT_JSON', todos: parsed });
+      } catch (err) {
+        console.error('Failed to parse stored todos', err);
+      }
+    }
+  }, []);
+
+  // Save to localStorage when todos change
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(state.todos));
+  }, [state.todos]);
+
   return (
     <TodoContext.Provider value={{ state, dispatch }}>
       {children}

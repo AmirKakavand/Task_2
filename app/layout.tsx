@@ -2,6 +2,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { TodoProvider } from '../context/todo-context'
+import Navigation from './components/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +20,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TodoProvider>
-          {children}
+          <main className="max-w-2xl mx-auto p-6">
+            <Navigation />
+            {children}
+          </main>
         </TodoProvider>
       </body>
     </html>
