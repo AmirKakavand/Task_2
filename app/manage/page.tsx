@@ -37,10 +37,10 @@ export default function ManagePage() {
     });
     const url = URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'incomplete_tasks.json';
-    a.click();
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = 'incomplete_tasks.json';
+    downloadLink.click();
     URL.revokeObjectURL(url);
   };
 
@@ -57,7 +57,7 @@ const handleImport = () => {
       throw new Error();
     }
 
-    // ✅ Now TypeScript knows this is ImportedTodo[]
+    // Now TypeScript knows this is ImportedTodo[]
     const tasks = (parsed as ImportedTodo[]).map((t) => ({
       id: crypto.randomUUID(),
       title: t.title,
